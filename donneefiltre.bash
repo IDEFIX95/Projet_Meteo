@@ -18,6 +18,11 @@ y_max=0
 y_min=0
 
 fichierdentree=''
+fichiersaint_pierre_et_mique=''
+
+
+
+fichiersortie=''
 option_oblig=0
 option_geo=0
 
@@ -31,12 +36,13 @@ numero_humidite=6
 numero_pression_station=7
 numero_variation_pression=8
 numero_precipitation=9
-numero_coordonne=10
-numero_temperature=11
-numero_temp_min=12
-numero_temp_max=13
-numero_altitude=14
-numero_commune=15
+numero_coordonne_x=10
+numero_coordonne_y=11
+numero_temperature=12
+numero_temp_min=13
+numero_temp_max=14
+numero_altitude=15
+numero_commune=16
 
 
 # les variables pour les zones geographiques
@@ -247,7 +253,7 @@ fi
 # Condition pour l'humidité
 
 if [ "$humidite" == "m" ];then
-    echo "bien joué"
+   echo "bien joué"
    cut -d';' -f"$numero_station","$numero_humidite" "$fichierdentree" > humidite.csv
 fi
 
@@ -256,20 +262,23 @@ fi
 
 if [ "$france_corse" == "F" ];then
     echo "bien joué"
-     awk -F ";" '{split('$numero_coordonne', coord, ";"); x = coord[1]; y = coord[2]; if (x < 48 && x > 46 && y > 55 && y < 57 ) {print x,y}}' "$fichierdentree"
+    awk -F ",;" '{if {print x,y}}' "$fichierdentree"
 fi  
 
 
 if [ "$guyane_francaise" == "G" ];then
     echo "bien joué"
-    awk -F ";" '{split('$numero_coordonne', coord, ";"); x = coord[1]; y = coord[2]; if (x < 48 && x > 46 && y > 55 && y < 57 ) {print x,y}}' "$fichierdentree"
+    awk -F ",;" '{split('$numero_coordonne', coord, ";"); x = coord[1]; y = coord[2]; if (x < 48 && x > 46 && y > 55 && y < 57 ) {print x,y}}' "$fichierdentree"
 fi  
 
 
 if [ "$saint_pierre_et_mique" == "S" ];then
     echo "bien joué"
-    
-    grep $x_max=48 $x_min=46 $y_min=55 $y_max=57 | awk -F ";" '{split( $numero_coordonne, coord, ";"); x = coord[1]; y = coord[2]; if (x < 48 && x > 46 && y > 55 && y < 57 ) {print x,y}}' "$fichierdentree" 
+    #ca marche pour double separateur entre crochet
+    awk -F "[;,]" '{if (('$numero_coordonne_x' < 48 && '$numero_coordonne_x' > 46) && ('$numero_coordonne_y' > 55 && '$numero_coordonne_y' < 57)) {print '$numero_coordonne_x','$numero_coordonne_y'}}' "$fichierdentree" > "$fichiersaint_pierre_et_mique"
+    fichiersortie="$fichiersaint_pierre_et_mique" 
+    $fichiersortie
+    #grep $x_max=48 $x_min=46 $y_min=55 $y_max=57 | awk -F ";" '{split( $numero_coordonne, coord, ";"); x = coord[1]; y = coord[2]; if (x < 48 && x > 46 && y > 55 && y < 57 ) {print x,y}}' "$fichierdentree" 
 fi  
 
 
@@ -307,7 +316,6 @@ fi
 
 shift $((OPTIND-1))
 echo "Analyse des options terminée"
-
 
 
 
