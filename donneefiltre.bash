@@ -11,26 +11,19 @@ pression=0
 vent=0
 humidite=0
 altitude=0
-count=0
-x_max=0
-x_min=0
-y_max=0
-y_min=0
 
 fichierdentree=''
-fichierfrance_et_corse=''
-fichierguyane=''
-fichiersaint_pierre_et_mique=''
-fichierantilles=''
-fichieroceanindien=''
-fichierantarctique=''
 
+date=0
 
+datedentree=''
 fichiersortie=''
 
 
 option_oblig=0
 option_geo=0
+option_tri=0
+option_date=0
 
 #les variables pour les numeros de champ du fichier d'entrée du csv
 numero_station=1
@@ -50,14 +43,6 @@ numero_altitude=14
 numero_commune=15
 
 
-# les variables pour les zones geographiques
-france_corse=0
-guyane_francaise=0
-saint_pierre_et_mique=0
-antille=0
-ocean_indien=0
-antarctique=0
-
 
 #if (( $# != 1));then
     #echo "Impossible aucune option saisie"
@@ -73,20 +58,21 @@ do
         case "$OPTARG" in
             tab)
                 tab=1
-                option="z"
-                make main.c
+                make all
                 echo "bien joué"
+                option_tri=$(($option_tri+1))
             ;;
             abr)
                 abr=1
-                option="z"
-
+                make all
                 echo "bien joué"
+                option_tri=$(($option_tri+1))
             ;;
             avl)
                 avl=1
-                option="z"
+                make all
                 echo "bien joué"
+                option_tri=$(($option_tri+1))
             ;;
             help)
                 help=1
@@ -143,12 +129,10 @@ do
             ;;
         m)
             humidite=${option}
-            #echo "bien joué"
             option_oblig=$(($option_oblig+1))
             ;;
         F)
             france_corse=${option}
-            #awk -F";" 'NR {print '$numero_coordonne'}' meteo_filtered_data_v1.csv
             option_geo=$(($option_geo+1))
             ;;
         G)
@@ -157,7 +141,6 @@ do
         ;;
         S)
             saint_pierre_et_mique=${option}
-           # echo "bien joué"
             option_geo=$(($option_geo+1))
         ;;
         A)
@@ -171,7 +154,11 @@ do
         Q)
             antarctique=${option}
             option_geo=$(($option_geo+1))
-            echo "bonjour"
+        ;;
+        d)
+            date=${option}
+            datedentree=${OPTARG}
+            option_date=$(($option_date+1))
         ;;
         :)
             echo "Erreur: -${OPTARG} argument recommander."
@@ -190,106 +177,161 @@ done
 
 ## Les nombreux testent à effectuer pour l'instant programmer comme cela
 
+# Test pour les options obligatoire et geographiques
+if (( "$option_geo" > 1));then
+    echo "Impossible d'executer trop d'option de lieux choisie."
+    exit 1
+fi
+
+
+if (( "$option_oblig" < 1));then
+    echo "Impossible aucune option obligatoire saisie"
+    exit 1
+fi
 
 ## Condition pour les lieux geographiques
 
 if [ "$france_corse" == "F" ];then
     echo "bien joué"
-    awk -F ",;" '{if {print x,y}}' "$fichierdentree"
+    awk -F ";" '{numero_coordonne=10;
+         split( $numero_coordonne, coord, ",");
+         x = coord[1];
+         y = coord[2]; 
+         if (x >41 && x <51 && y >-6 && y <11)  print $0}' "$fichierdentree" > france_corse.csv
+    fichiersortie='france_corse.csv'
 fi  
 
 
 if [ "$guyane_francaise" == "G" ];then
     echo "bien joué"
-    awk -F ",;" '{split('$numero_coordonne', coord, ";"); x = coord[1]; y = coord[2]; if (x < 48 && x > 46 && y > 55 && y < 57 ) {print x,y}}' "$fichierdentree"
-fi  
+    awk -F ";" '{numero_coordonne=10;
+         split( $numero_coordonne, coord, ",");
+         x = coord[1];
+         y = coord[2]; 
+         if (x >1 && x <7 && y >-55 && y <-50)  print $0}' "$fichierdentree" > guyane_francaise.csv
+    fichiersortie='guyane_francaise.csv'
+fi
 
 
 if [ "$saint_pierre_et_mique" == "S" ];then
     echo "bien joué"
-    #ca marche pour double separateur entre crochet
-    #awk -F ";" '{numero_coordonne=10; print $numero_coordonne}' "$fichierdentree" > saint_pierre_et_mique.csv
-    ##awk -F ";" '{numero_coordonne=10; split( $numero_coordonne, coord, ",");  print coord[1] ";" coord[2]}' "$fichierdentree" > saint_pierre_et_mique.csv
-    awk -F ";" '{numero_coordonne=10; split( $numero_coordonne, coord, ","); x = coord[1]; if ((x == "Coordonnees") || (x <48 && x > 46))  print x}' "$fichierdentree" > saint_pierre_et_mique1.csv
-    #awk -F "[;,]" '{if ('$numero_coordonne_x' < 48 && '$numero_coordonne_x' > 46 && '$numero_coordonne_y' > 55 && '$numero_coordonne_y' < 57) print '$numero_coordonne_x','$numero_coordonne_y'}' "$fichierdentree" > saint_pierre_et_mique.csv
-    #fichiersortie="$fichiersaint_pierre_et_mique" 
-    #$fichiersortie
-    #grep $x_max=48 $x_min=46 $y_min=55 $y_max=57 | awk -F ";" '{split( $numero_coordonne, coord, ";"); x = coord[1]; y = coord[2]; if (x < 48 && x > 46 && y > 55 && y < 57 ) {print x,y}}' "$fichierdentree" 
+    awk -F ";" '{numero_coordonne=10;
+         split( $numero_coordonne, coord, ",");
+         x = coord[1];
+         y = coord[2]; 
+         if (x >46 && x <48 && y >-57 && y <-55)  print $0}' "$fichierdentree" > saint_pierre_et_mique.csv
+    fichiersortie='saint_pierre_et_mique.csv'
 fi  
 
 
 if [ "$antille" == "A" ];then
     echo "bien joué"
-    awk -F ";" '{split( $numero_coordonne, coord, ";"); x = coord[1]; y = coord[2]; if (x < 48 && x > 46 && y > 55 && y < 57 ) {print x,y}}' "$fichierdentree"
-    fichiersortie="$fichierantille"
+   awk -F ";" '{numero_coordonne=10;
+         split( $numero_coordonne, coord, ",");
+         x = coord[1];
+         y = coord[2]; 
+         if (x >12 && x <19 && y >-75 && y <-58)  print $0}' "$fichierdentree" > antille.csv
+   fichiersortie='antille.csv'
 fi  
 
 
 if [ "$ocean_indien" == "O" ];then
     echo "bien joué"
-    awk -F ";" '{split('$numero_coordonne', coord, ";"); x = coord[1]; y = coord[2]; if (x < 48 && x > 46 && y > 55 && y < 57 ) {print x,y}}' "$fichierdentree"
-    fichiersortie="$fichieroceanindien"
+    awk -F ";" '{numero_coordonne=10;
+         split( $numero_coordonne, coord, ",");
+         x = coord[1];
+         y = coord[2]; 
+         if (x >-55 && x <-10 && y >41 && y <113)  print $0}' "$fichierdentree" > ocean_indien.csv
+   fichiersortie='ocean_indien.csv'
 fi  
 
 
 if [ "$antarctique" == "Q" ];then
     echo "bien joué"
-    awk -F ";" '{split('$numero_coordonne', coord, ";"); x = coord[1]; y = coord[2]; if (x < 48 && x > 46 && y > 55 && y < 57 ) {print x,y}}' "$fichierdentree"
-    fichiersortie="$fichierantarctique"
+    awk -F ";" '{numero_coordonne=10;
+         split( $numero_coordonne, coord, ",");
+         x = coord[1];
+         y = coord[2]; 
+         if (x >-83 && x <-61 && y >-172 && y <177)  print $0}' "$fichierdentree" > antarctique.csv
+   fichiersortie='antarctique.csv'
+
 fi  
 
+# date / horaires
 
+if [ "$date" == "d" ];then
+    echo "bien joué"
+    datedentree
+    awk -F ";" '{numero_date=2; 
+        split( $numero_date, coord, ",")
+        date = coord[1];
+        horaire = coord[2];
+        if (date >date_min && date <date_max) print &0}' "$fichierdentree" > datefiltrer.csv
+fi
+
+#sed
+
+if [ "$option_geo" -eq 1 ];then
+    fichierdentree="$fichiersortie"
+fi
 
 
 #Pour la temperature
 
-if [ "$temperature" -eq 1 ]
+if [ "$temperature" -eq 1 ];
        then
-       #temperature1=$temperature
-       #awk  -F BEGIN{OFS=";"} FS=";" '{print $1,$2,$11,$12,$13}'  meteo_filtered_data_v1.csv > temp1.csv
-       cut -d';' -f"$numero_station","$numero_date","$numero_temperature","$numero_temp_min","$numero_temp_max" "$fichierdentree" > temp1.csv
-       
-       #echo "$option_oblig"
-       #echo "bien joué en cours de transfert"
+       tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_date","$numero_temperature","$numero_temp_min","$numero_temp_max" > temp1.csv
+       if [ "$option_geo" -eq 1 ];then
+            rm "$fichierdentree"
+       fi
 fi
-if [ "$temperature" -eq 2 ]
+
+if [ "$temperature" -eq 2 ];
         then
-        #temperature2=$temperature
-        cut -d';' -f"$numero_date","$numero_temperature" "$fichierdentree" > temp2.csv
-        #echo ${temperature2}
-        #echo "bien joué"
+        tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_date","$numero_temperature" > temp2.csv
+        if [ "$option_geo" -eq 1 ];then
+            rm "$fichierdentree"
+        fi
+        
 fi
-if [ "$temperature" -eq 3 ]
+
+if [ "$temperature" -eq 3 ];
         then
-        #temperature3=$temperature
-        cut -d';' -f"$numero_station","$numero_date","$numero_temperature" "$fichierdentree" > temp3.csv
-        #echo "bien joué"
+        tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_date","$numero_temperature" > temp3.csv
+        if [ "$option_geo" -eq 1 ];then
+            rm "$fichierdentree"
+        fi
+        
 fi        
 
 # Condition pour la pression
 
 
-if [ "$pression" -eq 1 ]
-       then
-       
-       #awk  -F BEGIN{OFS=";"} FS=";" '{print $1,$2,$11,$12,$13}'  meteo_filtered_data_v1.csv > temp1.csv
-       cut -d';' -f"$numero_station","$numero_pression_station","$numero_variation_pression" "$fichierdentree" > press1.csv
-       
-       #echo "$option_oblig"
-       #echo "bien joué en cours de transfert"
+if [ "$pression" -eq 1 ];
+    then
+    tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_pression_station","$numero_variation_pression"  > press1.csv
+    if [ "$option_geo" -eq 1 ];then
+        rm "$fichierdentree"
+    fi
+    
 fi
-if [ "$pression" -eq 2 ]
-       then
-       
-       #awk  -F BEGIN{OFS=";"} FS=";" '{print $1,$2,$11,$12,$13}'  meteo_filtered_data_v1.csv > temp1.csv
-       cut -d';' -f"$numero_date","$numero_pression_station","$numero_variation_pression" "$fichierdentree" > press2.csv
-       #echo "bien joué en cours de transfert"
+
+if [ "$pression" -eq 2 ];
+    then
+    tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_date","$numero_pression_station","$numero_variation_pression"  > press2.csv
+    if [ "$option_geo" -eq 1 ];then
+        rm "$fichierdentree"
+    fi 
+    
 fi
-if [ "$pression" -eq 3 ]
-       then
-       #awk  -F BEGIN{OFS=";"} FS=";" '{print $1,$2,$11,$12,$13}'  meteo_filtered_data_v1.csv > temp1.csv
-       cut -d';' -f"$numero_station","$numero_date","$numero_pression_station","$numero_variation_pression" "$fichierdentree" > press3.csv
-       #echo "bien joué en cours de transfert"
+
+if [ "$pression" -eq 3 ];
+    then
+    tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_date","$numero_pression_station","$numero_variation_pression" > press3.csv
+    if [ "$option_geo" -eq 1 ];then
+        rm "$fichierdentree"
+    fi 
+    
 fi
 
 
@@ -297,8 +339,10 @@ fi
 
 
 if [ "$vent" == "w" ];then
-    echo "bien joué"
-    cut -d';' -f"$numero_station","$numero_direct_vent","$numero_vitesse_du_vent_moy" "$fichierdentree" > vent.csv
+    tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_direct_vent","$numero_vitesse_du_vent_moy" > vent.csv
+    if [ "$option_geo" -eq 1 ];then
+        rm "$fichierdentree"
+    fi
 fi
 
 
@@ -308,8 +352,10 @@ fi
 
 
 if [ "$altitude" == "h" ];then
-   # echo "bien joué"
-    cut -d';' -f"$numero_station","$numero_altitude" "$fichierdentree" > altitude.csv
+    tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_altitude" > altitude.csv
+    if [ "$option_geo" -eq 1 ];then
+        rm "$fichierdentree"
+    fi
 fi
 
 
@@ -319,7 +365,10 @@ fi
 
 if [ "$humidite" == "m" ];then
    echo "bien joué"
-   cut -d';' -f"$numero_station","$numero_humidite" "$fichierdentree" > humidite.csv
+   tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_humidite" > humidite.csv
+   if [ "$option_geo" -eq 1 ];then
+        rm "$fichierdentree"
+   fi
 fi
 
 
@@ -332,11 +381,6 @@ fi
 #    echo "Impossible aucune option saisie"
  #   exit 1
 #fi
-
-if (( "$option_geo" > 1));then
-    echo "Impossible d'executer trop d'option de lieux choisie."
-    exit 1
-fi
 
 
 shift $((OPTIND-1))
@@ -351,3 +395,4 @@ echo "Analyse des options terminée"
 
 
 exit 0
+
