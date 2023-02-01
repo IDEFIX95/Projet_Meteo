@@ -53,7 +53,7 @@ numero_commune=15
 #fi
 
 ##Gestion des parametres
-while getopts ":FGSAOQywhmf:d:t:p:-:" option;
+while getopts ":FGSAOQwhmf:d:t:p:-:" option;
 do
     # Commencons par la gestion des options longues
     if [ "$option" = '-' ]
@@ -160,13 +160,13 @@ do
         ;;
         d)
             date=${option}
-            #datedentree=${OPTARG}
-            date_min=$1
-            date_max=$2
+            datedentree=${OPTARG}
+            date_min=${datedentree%%,*}
+            date_max=${datedentree##*,}
+            echo "$date_min"
+            echo "$date_max"
+            date_verification="#^[0-9]{4}"
             option_date=$(($option_date+1))
-        ;;
-        y)
-            date=${option}
         ;;
         :)
             echo "Erreur: -${OPTARG} argument recommander."
@@ -267,15 +267,12 @@ fi
 
 # date / horaires
 
-if [ "$date" == "y" ];then
+if [ "$date" == "d" ];then
     echo "bien joué"
-    #datedentree='^[1-3]+$'
-    awk -F ";" '{numero_date=2; 
-        split( $numero_date, coord, "T")
-        date = coord[1];
-        horaire = coord[2];
-        print $numero_date}' "$fichierdentree" > datefiltrer.csv
-        # if (date >$date_min && date <$date_max) print &}' "$fichierdentree" > datefiltrer.csv
+   # datedentree='^[1-3]+$'
+   #tail -n+2 "$fichierdentree" | awk -F "[T;]"  '{ numero_date=2; if($numero_date >date_min && $numero_date <date_max) print $numero_date}' > datefiltrer.csv #'{#numero_date=2; 
+    sed 's/T/,/g' "$fichierdentree" | awk -F ";" -v min_date="$date_min" -v max_date="$date_max" '{numero_date=2; split ( $numero_date, coord , ","); date = coord[1]; horaires = coord[2]; if(date >min_date && date <max_date) print $0}' >  datefiltrer.csv
+    
 fi
 
 #sed
@@ -393,4 +390,6 @@ echo "Analyse des options terminée"
 
 
 exit 0
+
+
 
