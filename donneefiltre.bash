@@ -15,6 +15,9 @@ altitude=0
 fichierdentree=''
 
 date=0
+date_max=''
+date_min=''
+
 
 datedentree=''
 fichiersortie=''
@@ -50,7 +53,7 @@ numero_commune=15
 #fi
 
 ##Gestion des parametres
-while getopts ":FGSAOQwhmf:d:t:p:-:" option;
+while getopts ":FGSAOQywhmf:d:t:p:-:" option;
 do
     # Commencons par la gestion des options longues
     if [ "$option" = '-' ]
@@ -157,8 +160,13 @@ do
         ;;
         d)
             date=${option}
-            datedentree=${OPTARG}
+            #datedentree=${OPTARG}
+            date_min=$1
+            date_max=$2
             option_date=$(($option_date+1))
+        ;;
+        y)
+            date=${option}
         ;;
         :)
             echo "Erreur: -${OPTARG} argument recommander."
@@ -184,10 +192,10 @@ if (( "$option_geo" > 1));then
 fi
 
 
-if (( "$option_oblig" < 1));then
-    echo "Impossible aucune option obligatoire saisie"
-    exit 1
-fi
+#if (( "$option_oblig" < 1));then
+ #   echo "Impossible aucune option obligatoire saisie"
+  #  exit 1
+#fi
 
 ## Condition pour les lieux geographiques
 
@@ -259,14 +267,15 @@ fi
 
 # date / horaires
 
-if [ "$date" == "d" ];then
+if [ "$date" == "y" ];then
     echo "bien joué"
-    datedentree
+    #datedentree='^[1-3]+$'
     awk -F ";" '{numero_date=2; 
-        split( $numero_date, coord, ",")
+        split( $numero_date, coord, "T")
         date = coord[1];
         horaire = coord[2];
-        if (date >date_min && date <date_max) print &0}' "$fichierdentree" > datefiltrer.csv
+        print $numero_date}' "$fichierdentree" > datefiltrer.csv
+        # if (date >$date_min && date <$date_max) print &}' "$fichierdentree" > datefiltrer.csv
 fi
 
 #sed
@@ -301,7 +310,6 @@ if [ "$temperature" -eq 3 ];
         if [ "$option_geo" -eq 1 ];then
             rm "$fichierdentree"
         fi
-        
 fi        
 
 # Condition pour la pression
@@ -371,16 +379,6 @@ if [ "$humidite" == "m" ];then
    fi
 fi
 
-
-
-#echo "$option_oblig"
-
-# Test pour les options obligatoire et geographiques
-
-#if (( "$option_oblig" < 1));then
-#    echo "Impossible aucune option saisie"
- #   exit 1
-#fi
 
 
 shift $((OPTIND-1))
