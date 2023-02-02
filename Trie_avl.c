@@ -1,128 +1,118 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Trie_avl.h"
+#include "Tri_abr.h"
+#include "Tri_avl.h"
+#include "Tri_tab.h"
+#include <unistd.h>
+//faire getopt
 
-parbre creerArbre (double a){
-    parbre arbre = malloc(sizeof(arbre));
-    if( arbre == NULL){
-        fprintf(stderr, "ALLOCATION DYNAMIQUE IMPOSSIBLE %d");
-        exit(1);
-    }
-    arbre->element = a;
-    arbre->left_son = NULL;
-    arbre->right_son = NULL;
-    arbre->equilibre = 0;
-    return arbre;
-}
+int main(int argc, char *argv[])
+{
+    int flags, opt;
+    int nsecs, tfnd;
+    nsecs = 0;
+    tfnd = 0;
+    flags = 0;
+    while ((opt = getopt(argc, argv, "rf:o:-:")) != -1) {
+        switch (opt) {
+        case 'f':
+            
+            break;
+        case 'o':
+            
+            break;
+        case 'r':
 
-int estVide (parbre a){
-    if(a == NULL){
+            break
+        
+
+    if (argc < 2){
+        fprintf(stderr, "Erreur : Aucun fichier spécifié \n");
         return 1;
     }
-    else{
-        return 0;
+    FILE * fichier1 = fopen("fichier_filtre", "r");
+    if(fichier1 == NULL){    
+        return 2;
     }
-}
-
-void parcoursinfixe (parbre a){ // Parcours dans l'ordre croissant
-    if((estVide(a))!=1){
-        parcoursinfixe(a->left_son);
-        fprintf(fichier2,"%lf",a->elmt);
-        parcoursinfixe(a->right_son);
+    FILE * fichier2 = fopen("fichier_trie", "w+");
+    if(fichier2 == NULL){
+        return 2;
     }
-}
+   
 
-void parcoursdecroissant (parbre a){ //Parcours dans l'ordre décroissant
-    if((estVide(a))!=1){
-        parcoursdecroissant(a->right_son);
-        fprintf(fichier2,"%lf",a->elmt);
-        parcoursdecroissant(a->left_son);
-    }
-}
+    char recursif[] = "-r";
+    char abr[] = "--abr";
+    char avl[] = "--avl";
+    char tab[] = "--tab";
+    int res;
+    int a=0;
+    for(int i=0; i < argc; i++){
+        if(argv[i]=="--abr"){
+            printf("bonjour");
+        })
 
-parbre rotationGauche (parbre a){
-    parbre pivot;
-    int eq_a, eq_p;
-    pivot = a->right_son;
-    a->right_son = pivot->left_son;
-    pivot->left_son = a;
-    eq_a = a->equilibre;
-    eq_p = pivot->equilibre;
-    a->equilibre = eq_a - max(eq_p, 0) - 1;
-    pivot->equilibre = min(eq_a-2, eq_a+eq_p-2, eq_p-1);
-    a = pivot;
-    return a;
-}
 
-parbre rotationDroite (parbre a){
-    parbre pivot;
-    int eq_a, eq_p;
-    pivot = a->left_son;
-    a->left_son = pivot->right_son;
-    pivot->right_son = a;
-    eq_a = a->equilibre;
-    eq_p = pivot->equilibre;
-    a->equilibre = eq_a - min(eq_p, 0) + 1;
-    pivot->equilibre = max(eq_a+2, eq_a+eq_p+2, eq_p+1);
-    a = pivot;
-    return a;
-}
 
-parbre doubleRotationGauche (parbre a){
-    a->right_son = rotationDroite(a->right_son);
-    return rotationGauche(a);
-}
 
-parbre doubleRotationDroite (parbre a){
-    a->left_son = rotationGauche(a->left_son);
-    return rotationDroite(a);
-}
 
-parbre equilibrageAVL (parbre a){
-    if(a->equilibre >= 2){
-        if(a->right_son->equilibre >= 0){
-            return rotationGauche(a);
-        }
-        else{
-            return doubleRotationGauche(a);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        res = strcmp(recursif,argv[i]);
+        if(res==0){
+            a=1;
+            for(int i=0; i < argc; i++){
+                res = strcmp(abr,argv[i]);
+                if(res==0){
+                a=1;
+            //Faut faire un tri abr croissant
+            }
         }
     }
-    else if(a->equilibre <= -2){
-        if(a->left_son->equilibre <= 0){
-            return rotationDroite(a);
-        }
-        else{
-            return doubleRotationDroite(a);
+            //Faut faire un tri decroissant
         }
     }
-    return a;
+    for(int i=0; i < argc; i++){
+        res = strcmp(tab,argv[i]);
+        if(res==0){
+            a=1;
+            //Faut faire un tri par liste chainee croissant
+        }
+    }
+    for(int i=0; i < argc; i++){
+        res = strcmp(abr,argv[i]);
+        if(res==0){
+            a=1;
+            //Faut faire un tri abr croissant
+        }
+    }
+    for(int i=0; i < argc; i++){
+        res = strcmp(avl,argv[i]);
+        if(res==0){
+            a=1;
+            //Faut faire un tri avl croissant
+        }
+    }
+    if(a==0){
+        //Faire un tri avl croissant
+    }
+
+
+// free malloc
+    fclose(fichier1);
+    fclose(fichier2);
+    return 0;
 }
 
-parbre insertionAVL (parbre a, double c, double *h){
-    if(a == NULL){
-        *h = 1;
-        return creerArbre(c);
-    }
-    else if(a->element > c){
-        a->left_son = insertionAVL(a->left_son,c,h);
-        *h = -*h;
-    }
-    else if(a->element < c){
-        a->right_son = insertionAVL(a->right_son,c,h);
-    }
-    else{
-        *h = 0;
-    }
-    if(*h != 0){
-        a->equilibre = a->equilibre + *h;
-        a = equilibrageAVL(a);
-        if(a->equilibre == 0){
-            *h = 0;
-        }
-        else{
-            *h = 1;
-        }
-    }
-    return a;
-}
 
