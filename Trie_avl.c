@@ -141,7 +141,7 @@ parbre insertionAVL (parbre a, float a1, float a2, float a3, float a4, float a5,
     else{
         parbre doublons=creerArbre(a1,a2,a3,a4,a5);
         if (estVide(a->fils_droit)){
-            a->fils_droit=doublons->fils_droit;
+            a->fils_droit=doublons
         }
         else{
             doublons->fils_droit=a->fils_droit;
