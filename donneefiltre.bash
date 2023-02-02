@@ -23,11 +23,14 @@ datedentree=''
 fichiersortiedate=''
 fichiersortiegeo=''
 
-
 option_oblig=0
 option_geo=0
 option_tri=0
+option_tri=$(($option_tri+1))
 option_date=0
+
+retour=''
+
 
 #les variables pour les numeros de champ du fichier d'entrée du csv
 numero_station=1
@@ -39,12 +42,13 @@ numero_humidite=6
 numero_pression_station=7
 numero_variation_pression=8
 numero_precipitation=9
-#numero_coordonne=10
+numero_coordonne=10
 numero_temperature=11
 numero_temp_min=12
 numero_temp_max=13
 numero_altitude=14
 numero_commune=15
+
 
 
 
@@ -62,21 +66,21 @@ do
         case "$OPTARG" in
             tab)
                 tab=1
-                make all
+                tri_tab=${option}
                 echo "bien joué"
-                option_tri=$(($option_tri+1))
+                #option_tri=$(($option_tri+1))
             ;;
             abr)
                 abr=1
-                make all
+                tri_abr=${option}
                 echo "bien joué"
-                option_tri=$(($option_tri+1))
+                #option_tri=$(($option_tri+1))
             ;;
             avl)
                 avl=1
-                make all
+                tri_avl=${option}
                 echo "bien joué"
-                option_tri=$(($option_tri+1))
+                
             ;;
             help)
                 help=1
@@ -99,7 +103,7 @@ do
             ;;
         esac
     else
-        case "$option" in           #Test des options courtes
+        case "$option" in           #Gestion des options courtes
         f)
             fichierdentree=${OPTARG}
             ;;      
@@ -166,9 +170,10 @@ do
             date_max=${datedentree##*,}
             echo "$date_min"
             echo "$date_max"
-            date_verification="#^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-            if ! [[ $date_min =~ $date_verification ]];then
-                echo "veuillez reselectionner"
+            date_verification="^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            if ! [[ $date_min =~ $date_verification && $date_max =~ $date_verification ]];then
+                echo "Date invalide. Veuillez reslectionner une date qui respecte la synthaxe suivante AAAA-MM-JJ avec entre les deux dates le separateur suivant : , "
+                exit 1
             fi
             option_date=$(($option_date+1))
         ;;
@@ -189,6 +194,21 @@ done
 
 ## Les nombreux testent à effectuer pour l'instant programmer comme cela
 
+
+# Verification de mon fichier C
+
+if [ ! -x tri ];then
+    make all
+    retour=$?
+    if (( retour != '0' ));then
+        exit 1
+    fi
+else
+    echo "le fichier ./tri"
+fi
+
+
+
 # Test pour les options obligatoire et geographiques
 if (( "$option_geo" > 1));then
     echo "Impossible d'executer trop d'option de lieux choisie."
@@ -197,15 +217,14 @@ fi
 
 
 #if (( "$option_oblig" < 1));then
- #   echo "Impossible aucune option obligatoire saisie"
-  #  exit 1
+  #  echo "Impossible aucune option obligatoire saisie"
+ #   exit 1
 #fi
 
 # date / horaires
 
 if [ "$date" == "d" ];then
-    echo "bien joué"
-   # datedentree='^[1-3]+$'
+   echo "bien joué"
    #tail -n+2 "$fichierdentree" | awk -F "[T;]"  '{ numero_date=2; if($numero_date >date_min && $numero_date <date_max) print $numero_date}' > datefiltrer.csv #'{#numero_date=2; 
    sed 's/T/,/g' "$fichierdentree" | awk -F ";" -v min_date="$date_min" -v max_date="$date_max" '{numero_date=2; split ( $numero_date, coord , ","); date = coord[1]; horaires = coord[2]; if(date >=min_date && date <=max_date) print $0}' >  datefiltrer.csv
    fichiersortiedate='datefiltrer.csv' 
@@ -282,7 +301,7 @@ if [ "$antarctique" == "Q" ];then
    fichiersortiegeo='antarctique.csv'
 
 fi  
-
+    
 
 if [ "$option_geo" -eq 1 ];then
     fichierdentree="$fichiersortiegeo"
@@ -294,9 +313,14 @@ fi
 if [ "$temperature" -eq 1 ];
        then
        tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_date","$numero_temperature","$numero_temp_min","$numero_temp_max" > temp1.csv
+       
        if [ "$option_geo" -eq 1 ];then
             rm "$fichierdentree"
        fi
+       if [ "$option_date" -eq 1 ];then
+            rm datefiltrer.csv
+       fi
+       ./tri -f temp1.csv -o temp1_sorted.csv        
 fi
 
 if [ "$temperature" -eq 2 ];
@@ -305,7 +329,10 @@ if [ "$temperature" -eq 2 ];
         if [ "$option_geo" -eq 1 ];then
             rm "$fichierdentree"
         fi
-        
+        if [ "$option_date" -eq 1 ];then
+            rm datefiltrer.csv
+        fi
+        ./tri -f temp2.csv -o temp2_sorted.csv         
 fi
 
 if [ "$temperature" -eq 3 ];
@@ -314,6 +341,10 @@ if [ "$temperature" -eq 3 ];
         if [ "$option_geo" -eq 1 ];then
             rm "$fichierdentree"
         fi
+        if [ "$option_date" -eq 1 ];then
+            rm datefiltrer.csv
+        fi
+        ./tri -f temp3.csv -o temp3_sorted.csv         
 fi        
 
 # Condition pour la pression
@@ -325,7 +356,10 @@ if [ "$pression" -eq 1 ];
     if [ "$option_geo" -eq 1 ];then
         rm "$fichierdentree"
     fi
-    
+    if [ "$option_date" -eq 1 ];then
+        rm datefiltrer.csv
+    fi   
+    ./tri -f press1.csv -o press1_sorted.csv      
 fi
 
 if [ "$pression" -eq 2 ];
@@ -334,7 +368,10 @@ if [ "$pression" -eq 2 ];
     if [ "$option_geo" -eq 1 ];then
         rm "$fichierdentree"
     fi 
-    
+    if [ "$option_date" -eq 1 ];then
+        rm datefiltrer.csv
+    fi
+    ./tri -f press2.csv -o press2_sorted.csv         
 fi
 
 if [ "$pression" -eq 3 ];
@@ -343,7 +380,10 @@ if [ "$pression" -eq 3 ];
     if [ "$option_geo" -eq 1 ];then
         rm "$fichierdentree"
     fi 
-    
+    if [ "$option_date" -eq 1 ];then
+        rm datefiltrer.csv
+    fi
+    ./tri -f press3.csv -o press3_sorted.csv         
 fi
 
 
@@ -355,6 +395,10 @@ if [ "$vent" == "w" ];then
     if [ "$option_geo" -eq 1 ];then
         rm "$fichierdentree"
     fi
+    if [ "$option_date" -eq 1 ];then
+        rm datefiltrer.csv
+    fi
+    ./tri -f vent.csv -o vent_sorted.csv         
 fi
 
 
@@ -368,6 +412,10 @@ if [ "$altitude" == "h" ];then
     if [ "$option_geo" -eq 1 ];then
         rm "$fichierdentree"
     fi
+    if [ "$option_date" -eq 1 ];then
+        rm datefiltrer.csv
+    fi
+    ./tri -f altitude.csv -o altitude_sorted.csv         
 fi
 
 
@@ -381,7 +429,12 @@ if [ "$humidite" == "m" ];then
    if [ "$option_geo" -eq 1 ];then
         rm "$fichierdentree"
    fi
+   if [ "$option_date" -eq 1 ];then
+        rm datefiltrer.csv
+   fi
+   ./tri -f humidite.csv -o humidite_sorted.csv         
 fi
+
 
 
 
