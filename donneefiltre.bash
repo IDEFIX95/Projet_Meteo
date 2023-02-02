@@ -17,10 +17,11 @@ fichierdentree=''
 date=0
 date_max=''
 date_min=''
-
+date_verification=''
 
 datedentree=''
-fichiersortie=''
+fichiersortiedate=''
+fichiersortiegeo=''
 
 
 option_oblig=0
@@ -165,7 +166,10 @@ do
             date_max=${datedentree##*,}
             echo "$date_min"
             echo "$date_max"
-            date_verification="#^[0-9]{4}"
+            date_verification="#^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            if ! [[ $date_min =~ $date_verification ]];then
+                echo "veuillez reselectionner"
+            fi
             option_date=$(($option_date+1))
         ;;
         :)
@@ -197,6 +201,20 @@ fi
   #  exit 1
 #fi
 
+# date / horaires
+
+if [ "$date" == "d" ];then
+    echo "bien joué"
+   # datedentree='^[1-3]+$'
+   #tail -n+2 "$fichierdentree" | awk -F "[T;]"  '{ numero_date=2; if($numero_date >date_min && $numero_date <date_max) print $numero_date}' > datefiltrer.csv #'{#numero_date=2; 
+   sed 's/T/,/g' "$fichierdentree" | awk -F ";" -v min_date="$date_min" -v max_date="$date_max" '{numero_date=2; split ( $numero_date, coord , ","); date = coord[1]; horaires = coord[2]; if(date >=min_date && date <=max_date) print $0}' >  datefiltrer.csv
+   fichiersortiedate='datefiltrer.csv' 
+fi
+
+if [ "$option_date" -eq 1 ];then
+    fichierdentree="$fichiersortiedate"
+fi
+
 ## Condition pour les lieux geographiques
 
 if [ "$france_corse" == "F" ];then
@@ -206,7 +224,7 @@ if [ "$france_corse" == "F" ];then
          x = coord[1];
          y = coord[2]; 
          if (x >41 && x <51 && y >-6 && y <11)  print $0}' "$fichierdentree" > france_corse.csv
-    fichiersortie='france_corse.csv'
+    fichiersortiegeo='france_corse.csv'
 fi  
 
 
@@ -217,7 +235,7 @@ if [ "$guyane_francaise" == "G" ];then
          x = coord[1];
          y = coord[2]; 
          if (x >1 && x <7 && y >-55 && y <-50)  print $0}' "$fichierdentree" > guyane_francaise.csv
-    fichiersortie='guyane_francaise.csv'
+    fichiersortiegeo='guyane_francaise.csv'
 fi
 
 
@@ -228,7 +246,7 @@ if [ "$saint_pierre_et_mique" == "S" ];then
          x = coord[1];
          y = coord[2]; 
          if (x >46 && x <48 && y >-57 && y <-55)  print $0}' "$fichierdentree" > saint_pierre_et_mique.csv
-    fichiersortie='saint_pierre_et_mique.csv'
+    fichiersortiegeo='saint_pierre_et_mique.csv'
 fi  
 
 
@@ -239,7 +257,7 @@ if [ "$antille" == "A" ];then
          x = coord[1];
          y = coord[2]; 
          if (x >12 && x <19 && y >-75 && y <-58)  print $0}' "$fichierdentree" > antille.csv
-   fichiersortie='antille.csv'
+   fichiersortiegeo='antille.csv'
 fi  
 
 
@@ -250,7 +268,7 @@ if [ "$ocean_indien" == "O" ];then
          x = coord[1];
          y = coord[2]; 
          if (x >-55 && x <-10 && y >41 && y <113)  print $0}' "$fichierdentree" > ocean_indien.csv
-   fichiersortie='ocean_indien.csv'
+   fichiersortiegeo='ocean_indien.csv'
 fi  
 
 
@@ -261,24 +279,13 @@ if [ "$antarctique" == "Q" ];then
          x = coord[1];
          y = coord[2]; 
          if (x >-83 && x <-61 && y >-172 && y <177)  print $0}' "$fichierdentree" > antarctique.csv
-   fichiersortie='antarctique.csv'
+   fichiersortiegeo='antarctique.csv'
 
 fi  
 
-# date / horaires
-
-if [ "$date" == "d" ];then
-    echo "bien joué"
-   # datedentree='^[1-3]+$'
-   #tail -n+2 "$fichierdentree" | awk -F "[T;]"  '{ numero_date=2; if($numero_date >date_min && $numero_date <date_max) print $numero_date}' > datefiltrer.csv #'{#numero_date=2; 
-    sed 's/T/,/g' "$fichierdentree" | awk -F ";" -v min_date="$date_min" -v max_date="$date_max" '{numero_date=2; split ( $numero_date, coord , ","); date = coord[1]; horaires = coord[2]; if(date >min_date && date <max_date) print $0}' >  datefiltrer.csv
-    
-fi
-
-#sed
 
 if [ "$option_geo" -eq 1 ];then
-    fichierdentree="$fichiersortie"
+    fichierdentree="$fichiersortiegeo"
 fi
 
 
@@ -390,6 +397,3 @@ echo "Analyse des options terminée"
 
 
 exit 0
-
-
-
