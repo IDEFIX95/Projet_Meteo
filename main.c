@@ -1,12 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Trie_abr.h"
-#include "Trie_avl.h"
-#include "Trie_Tab.h"
-
+#include "Tri_abr.h"
+#include "Tri_avl.h"
+#include "Tri_tab.h"
+#include <unistd.h>
 //faire getopt
 
-int main (int argc, char* argv[]){
+int main(int argc, char *argv[])
+{
+    int flags, opt;
+    int nsecs, tfnd;
+    nsecs = 0;
+    tfnd = 0;
+    flags = 0;
+    while ((opt = getopt(argc, argv, "rf:o:-:")) != -1) {
+        switch (opt) {
+        case 'f':
+            
+            break;
+        case 'o':
+            
+            break;
+        case 'r':
+
+            break
+        
+
     if (argc < 2){
         fprintf(stderr, "Erreur : Aucun fichier spécifié \n");
         return 1;
@@ -28,10 +47,32 @@ int main (int argc, char* argv[]){
     int res;
     int a=0;
     for(int i=0; i < argc; i++){
+        if(argv[i]=="--abr"){
+            printf("bonjour");
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         res = strcmp(recursif,argv[i]);
         if(res==0){
             a=1;
-            for(int i=; i < argc; i++){
+            for(int i=0; i < argc; i++){
                 res = strcmp(abr,argv[i]);
                 if(res==0){
                 a=1;
@@ -68,10 +109,10 @@ int main (int argc, char* argv[]){
     }
 
 
-
-
 // free malloc
     fclose(fichier1);
     fclose(fichier2);
     return 0;
 }
+
+
