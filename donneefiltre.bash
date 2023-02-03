@@ -1,4 +1,4 @@
-#!/bin/bash
+0#!/bin/bash
 
 #if [ ! -e $1 ] || [ ! -f $1 ];then #test si l'option est un fichier et qu'il existe
  #   echo "choix du fichier mauvais"
@@ -85,8 +85,8 @@ do
             help)
                 help=1
                 echo "creation du fichier help"
-                touch dochelp.txt
-                chmod 744 dochelp.txt
+                #touch dochelp.txt
+                #chmod 744 dochelp.txt
                 option_oblig=$(($option_oblig+1))
             ;;
             sup)
@@ -193,6 +193,12 @@ do
 done
 
 ## Les nombreux testent à effectuer pour l'instant programmer comme cela
+
+$@=$
+for (i=0,i<,i++);done
+
+do
+
 
 
 # Verification de mon fichier C
