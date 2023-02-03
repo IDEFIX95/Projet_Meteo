@@ -86,14 +86,7 @@ do
             ;;
             help)
                 help=1
-                echo "creation du fichier help"
-                for (( i=0; i<=$@; i++))
-                do
-                    if (( $@ == '--help' ));then
-                        cat dochelp.txt
-                        exit 1
-                    fi
-                done
+                
                 option_oblig=$(($option_oblig+1))
             ;;
             sup)
@@ -326,7 +319,7 @@ if [ "$temperature" -eq 1 ];
        if [ "$option_date" -eq 1 ];then
             rm datefiltrer.csv
        fi
-       ./tri -f temp1.csv -o temp1_sorted.csv  -t1 #-n "$tri" -t1 #"$numero"    
+       ./tri -f temp1.csv -o temp1_sortie.csv  -t1 #-n "$tri" -t1 #"$numero"    
 fi
 
 if [ "$temperature" -eq 2 ];
@@ -338,7 +331,7 @@ if [ "$temperature" -eq 2 ];
         if [ "$option_date" -eq 1 ];then
             rm datefiltrer.csv
         fi
-        ./tri -f temp2.csv -o temp2_sorted.csv  -n "$tri" -t "$numero"     
+        ./tri -f temp2.csv -o temp2_sortie.csv  -n "$tri" -t "$numero"     
 fi
 
 if [ "$temperature" -eq 3 ];
@@ -350,7 +343,7 @@ if [ "$temperature" -eq 3 ];
         if [ "$option_date" -eq 1 ];then
             rm datefiltrer.csv
         fi
-        ./tri -f temp3.csv -o temp3_sorted.csv  -n "$tri" -t "$numero"      
+        ./tri -f temp3.csv -o temp3_sortie.csv  -n "$tri" -t "$numero"      
 fi        
 
 # Condition pour la pression
@@ -365,7 +358,7 @@ if [ "$pression" -eq 1 ];
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi   
-    ./tri -f press1.csv -o press1_sorted.csv  -n "$tri"  -p "$numero"  
+    ./tri -f press1.csv -o press1_sortie.csv  -n "$tri"  -p "$numero"  
 fi
 
 if [ "$pression" -eq 2 ];
@@ -377,7 +370,7 @@ if [ "$pression" -eq 2 ];
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f press2.csv -o press2_sorted.csv  -n "$tri" -p "$numero"     
+    ./tri -f press2.csv -o press2_sortie.csv  -n "$tri" -p "$numero"     
 fi
 
 if [ "$pression" -eq 3 ];
@@ -389,7 +382,7 @@ if [ "$pression" -eq 3 ];
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f press3.csv -o press3_sorted.csv  -n "$tri" -p "$numero"     
+    ./tri -f press3.csv -o press3_sortie.csv  -n "$tri" -p "$numero"     
 fi
 
 
@@ -404,7 +397,7 @@ if [ "$vent" == "w" ];then
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f vent.csv -o vent_sorted.csv  -n "$tri" -w      
+    ./tri -f vent.csv -o vent_sortie.csv  -n "$tri" -w      
 fi
 
 
@@ -421,7 +414,8 @@ if [ "$altitude" == "h" ];then
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f altitude.csv -o altitude_sorted.csv  -n "$tri" -h      
+    ./tri -f altitude.csv -o altitude_sortie.csv  -n "$tri" -h  
+    gnuplot 'gnuplot/altitude.plt'    
 fi
 
 
@@ -438,7 +432,8 @@ if [ "$humidite" == "m" ];then
    if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
    fi
-   ./tri -f humidite.csv -o humidite_sorted.csv  -n "$tri" -m      
+   ./tri -f humidite.csv -o humidite_sortie.csv  -n "$tri" -m   
+   gnuplot 'gnuplot/humidite.plt'
 fi
 
 
