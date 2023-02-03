@@ -1,10 +1,5 @@
 #!/bin/bash
 
-#if [ ! -e $1 ] || [ ! -f $1 ];then #test si l'option est un fichier et qu'il existe
- #   echo "choix du fichier mauvais"
-    #exit 1
-#fi
-
 # les variables pour les options
 temperature=0
 pression=0
