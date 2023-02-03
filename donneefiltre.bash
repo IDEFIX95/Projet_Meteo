@@ -1,4 +1,4 @@
-0#!/bin/bash
+#!/bin/bash
 
 #if [ ! -e $1 ] || [ ! -f $1 ];then #test si l'option est un fichier et qu'il existe
  #   echo "choix du fichier mauvais"
@@ -14,10 +14,18 @@ altitude=0
 
 fichierdentree=''
 
+tri=0
+
 date=0
 date_max=''
 date_min=''
 date_verification=''
+
+
+temp_min=0
+temp_max=0
+compteur_div=0
+
 
 datedentree=''
 fichiersortiedate=''
@@ -51,12 +59,6 @@ numero_commune=15
 
 
 
-
-#if (( $# != 1));then
-    #echo "Impossible aucune option saisie"
-   # exit 1
-#fi
-
 ##Gestion des parametres
 while getopts ":FGSAOQwhmf:d:t:p:-:" option;
 do
@@ -65,19 +67,19 @@ do
     then
         case "$OPTARG" in
             tab)
-                tab=1
+                tri=1
                 tri_tab=${option}
                 echo "bien joué"
-                #option_tri=$(($option_tri+1))
+                
             ;;
             abr)
-                abr=1
+                tri=2
                 tri_abr=${option}
                 echo "bien joué"
-                #option_tri=$(($option_tri+1))
+                
             ;;
             avl)
-                avl=1
+                tri=3
                 tri_avl=${option}
                 echo "bien joué"
                 
@@ -85,8 +87,13 @@ do
             help)
                 help=1
                 echo "creation du fichier help"
-                #touch dochelp.txt
-                #chmod 744 dochelp.txt
+                for (( i=0; i<=$@; i++))
+                do
+                    if (( $@ == '--help' ));then
+                        cat dochelp.txt
+                        exit 1
+                    fi
+                done
                 option_oblig=$(($option_oblig+1))
             ;;
             sup)
@@ -194,23 +201,17 @@ done
 
 ## Les nombreux testent à effectuer pour l'instant programmer comme cela
 
-$@=$
-for (i=0,i<,i++);done
-
-do
-
-
 
 # Verification de mon fichier C
 
 if [ ! -x tri ];then
-    make all
+    #make all
     retour=$?
-    if (( retour != '0' ));then
+    if (( $retour != '0' ));then
         exit 1
     fi
 else
-    echo "le fichier ./tri"
+    echo "le fichier ./tri est compilé"
 fi
 
 
@@ -318,15 +319,14 @@ fi
 
 if [ "$temperature" -eq 1 ];
        then
-       tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_date","$numero_temperature","$numero_temp_min","$numero_temp_max" > temp1.csv
-       
+       tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_temperature","$numero_temp_min","$numero_temp_max" > temp1.csv
        if [ "$option_geo" -eq 1 ];then
             rm "$fichierdentree"
        fi
        if [ "$option_date" -eq 1 ];then
             rm datefiltrer.csv
        fi
-       ./tri -f temp1.csv -o temp1_sorted.csv        
+       ./tri -f temp1.csv -o temp1_sorted.csv  -t1 #-n "$tri" -t1 #"$numero"    
 fi
 
 if [ "$temperature" -eq 2 ];
@@ -338,7 +338,7 @@ if [ "$temperature" -eq 2 ];
         if [ "$option_date" -eq 1 ];then
             rm datefiltrer.csv
         fi
-        ./tri -f temp2.csv -o temp2_sorted.csv         
+        ./tri -f temp2.csv -o temp2_sorted.csv  -n "$tri" -t "$numero"     
 fi
 
 if [ "$temperature" -eq 3 ];
@@ -350,7 +350,7 @@ if [ "$temperature" -eq 3 ];
         if [ "$option_date" -eq 1 ];then
             rm datefiltrer.csv
         fi
-        ./tri -f temp3.csv -o temp3_sorted.csv         
+        ./tri -f temp3.csv -o temp3_sorted.csv  -n "$tri" -t "$numero"      
 fi        
 
 # Condition pour la pression
@@ -365,7 +365,7 @@ if [ "$pression" -eq 1 ];
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi   
-    ./tri -f press1.csv -o press1_sorted.csv      
+    ./tri -f press1.csv -o press1_sorted.csv  -n "$tri"  -p "$numero"  
 fi
 
 if [ "$pression" -eq 2 ];
@@ -377,7 +377,7 @@ if [ "$pression" -eq 2 ];
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f press2.csv -o press2_sorted.csv         
+    ./tri -f press2.csv -o press2_sorted.csv  -n "$tri" -p "$numero"     
 fi
 
 if [ "$pression" -eq 3 ];
@@ -389,7 +389,7 @@ if [ "$pression" -eq 3 ];
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f press3.csv -o press3_sorted.csv         
+    ./tri -f press3.csv -o press3_sorted.csv  -n "$tri" -p "$numero"     
 fi
 
 
@@ -404,7 +404,7 @@ if [ "$vent" == "w" ];then
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f vent.csv -o vent_sorted.csv         
+    ./tri -f vent.csv -o vent_sorted.csv  -n "$tri" -w      
 fi
 
 
@@ -421,7 +421,7 @@ if [ "$altitude" == "h" ];then
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f altitude.csv -o altitude_sorted.csv         
+    ./tri -f altitude.csv -o altitude_sorted.csv  -n "$tri" -h      
 fi
 
 
@@ -438,7 +438,7 @@ if [ "$humidite" == "m" ];then
    if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
    fi
-   ./tri -f humidite.csv -o humidite_sorted.csv         
+   ./tri -f humidite.csv -o humidite_sorted.csv  -n "$tri" -m      
 fi
 
 
