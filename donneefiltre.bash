@@ -216,12 +216,12 @@ if (( "$option_geo" > 1));then
 fi
 
 
-#if (( "$option_oblig" < 1));then
-  #  echo "Impossible aucune option obligatoire saisie"
- #   exit 1
-#fi
+if (( "$option_oblig" < 1));then
+    echo "Impossible aucune option obligatoire saisie"
+    exit 1
+fi
 
-# date / horaires
+# verification date / horaires
 
 if [ "$date" == "d" ];then
    echo "bien joué"
@@ -236,7 +236,7 @@ fi
 
 ## Condition pour les lieux geographiques
 
-if [ "$france_corse" == "F" ];then
+if [ "$france_corse" == "F" ];then               #pour la france et la corse
     echo "bien joué"
     awk -F ";" '{numero_coordonne=10;
          split( $numero_coordonne, coord, ",");
@@ -247,7 +247,7 @@ if [ "$france_corse" == "F" ];then
 fi  
 
 
-if [ "$guyane_francaise" == "G" ];then
+if [ "$guyane_francaise" == "G" ];then         #pour la guyane francaise
     echo "bien joué"
     awk -F ";" '{numero_coordonne=10;
          split( $numero_coordonne, coord, ",");
@@ -258,7 +258,7 @@ if [ "$guyane_francaise" == "G" ];then
 fi
 
 
-if [ "$saint_pierre_et_mique" == "S" ];then
+if [ "$saint_pierre_et_mique" == "S" ];then    #Pour saint pierre et miquelon
     echo "bien joué"
     awk -F ";" '{numero_coordonne=10;
          split( $numero_coordonne, coord, ",");
@@ -269,7 +269,7 @@ if [ "$saint_pierre_et_mique" == "S" ];then
 fi  
 
 
-if [ "$antille" == "A" ];then
+if [ "$antille" == "A" ];then              # pour les antilles
     echo "bien joué"
    awk -F ";" '{numero_coordonne=10;
          split( $numero_coordonne, coord, ",");
@@ -280,7 +280,7 @@ if [ "$antille" == "A" ];then
 fi  
 
 
-if [ "$ocean_indien" == "O" ];then
+if [ "$ocean_indien" == "O" ];then            #pour ocean pacifique
     echo "bien joué"
     awk -F ";" '{numero_coordonne=10;
          split( $numero_coordonne, coord, ",");
