@@ -312,14 +312,15 @@ fi
 
 if [ "$temperature" -eq 1 ];
        then
-       tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_temperature","$numero_temp_min","$numero_temp_max" > temp1.csv
+       tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_temperature","$numero_temp_min","$numero_temp_max" | sort -t, -k1 > temp1.csv
        if [ "$option_geo" -eq 1 ];then
             rm "$fichierdentree"
        fi
        if [ "$option_date" -eq 1 ];then
             rm datefiltrer.csv
-       fi
-       ./tri -f temp1.csv -o temp1_sortie.csv  -t1 #-n "$tri" -t1 #"$numero"    
+       fi 
+       gnuplot "t1.plt"
+       #./tri -f temp1.csv -o temp1_sortie.csv  -t1 #-n "$tri" -t1 #"$numero"    
 fi
 
 if [ "$temperature" -eq 2 ];
@@ -331,7 +332,7 @@ if [ "$temperature" -eq 2 ];
         if [ "$option_date" -eq 1 ];then
             rm datefiltrer.csv
         fi
-        ./tri -f temp2.csv -o temp2_sortie.csv  -n "$tri" -t "$numero"     
+       # ./tri -f temp2.csv -o temp2_sortie.csv  -n "$tri" -t "$numero"     
 fi
 
 if [ "$temperature" -eq 3 ];
@@ -343,7 +344,7 @@ if [ "$temperature" -eq 3 ];
         if [ "$option_date" -eq 1 ];then
             rm datefiltrer.csv
         fi
-        ./tri -f temp3.csv -o temp3_sortie.csv  -n "$tri" -t "$numero"      
+        #./tri -f temp3.csv -o temp3_sortie.csv  -n "$tri" -t "$numero"      
 fi        
 
 # Condition pour la pression
@@ -351,14 +352,15 @@ fi
 
 if [ "$pression" -eq 1 ];
     then
-    tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_pression_station","$numero_variation_pression"  > press1.csv
+    tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_pression_station","$numero_variation_pression" | sort -t, -k1 > press1.csv
     if [ "$option_geo" -eq 1 ];then
         rm "$fichierdentree"
     fi
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
-    fi   
-    ./tri -f press1.csv -o press1_sortie.csv  -n "$tri"  -p "$numero"  
+    fi 
+    gnuplot "gnuplot/p1.plt"   
+   # ./tri -f press1.csv -o press1_sortie.csv  -n "$tri"  -p "$numero"  
 fi
 
 if [ "$pression" -eq 2 ];
@@ -370,7 +372,8 @@ if [ "$pression" -eq 2 ];
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f press2.csv -o press2_sortie.csv  -n "$tri" -p "$numero"     
+    gnuplot "gnuplot/p2.plt"
+    #./tri -f press2.csv -o press2_sortie.csv  -n "$tri" -p "$numero"     
 fi
 
 if [ "$pression" -eq 3 ];
@@ -382,7 +385,7 @@ if [ "$pression" -eq 3 ];
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f press3.csv -o press3_sortie.csv  -n "$tri" -p "$numero"     
+    #./tri -f press3.csv -o press3_sortie.csv  -n "$tri" -p "$numero"     
 fi
 
 
@@ -390,14 +393,14 @@ fi
 
 
 if [ "$vent" == "w" ];then
-    tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_direct_vent","$numero_vitesse_du_vent_moy" > vent.csv
+    tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_direct_vent","$numero_vitesse_du_vent_moy" | sort -t, -k1 > vent.csv
     if [ "$option_geo" -eq 1 ];then
         rm "$fichierdentree"
     fi
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f vent.csv -o vent_sortie.csv  -n "$tri" -w      
+    #./tri -f vent.csv -o vent_sortie.csv  -n "$tri" -w      
 fi
 
 
@@ -407,14 +410,14 @@ fi
 
 
 if [ "$altitude" == "h" ];then
-    tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_altitude" > altitude.csv
+    tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_altitude" | sort -t, -k14 -r > altitude.csv
     if [ "$option_geo" -eq 1 ];then
         rm "$fichierdentree"
     fi
     if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
     fi
-    ./tri -f altitude.csv -o altitude_sortie.csv  -n "$tri" -h  
+    #./tri -f altitude.csv -o altitude_sortie.csv  -n "$tri" -h  
     gnuplot 'gnuplot/altitude.plt'    
 fi
 
@@ -425,14 +428,14 @@ fi
 
 if [ "$humidite" == "m" ];then
    echo "bien joué"
-   tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_humidite" > humidite.csv
+   tail -n+2 "$fichierdentree" | cut -d';' -f"$numero_station","$numero_humidite" | sort -t, -k6 -r > humidite.csv
    if [ "$option_geo" -eq 1 ];then
         rm "$fichierdentree"
    fi
    if [ "$option_date" -eq 1 ];then
         rm datefiltrer.csv
    fi
-   ./tri -f humidite.csv -o humidite_sortie.csv  -n "$tri" -m   
+   #./tri -f humidite.csv -o humidite_sortie.csv  -n "$tri" -m   
    gnuplot 'gnuplot/humidite.plt'
 fi
 
